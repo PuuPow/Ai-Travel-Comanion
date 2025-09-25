@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f5f5f5; }
+        .success { border-color: green; background: #e8f5e8; }
+        .error { border-color: red; background: #ffe8e8; }
+        input, button { margin: 5px; padding: 8px; }
+        button { background: #007cba; color: white; border: none; cursor: pointer; }
+        button:hover { background: #005a87; }
+    </style>
+</head>
+<body>
+    <h1>Frontend Registration Test</h1>
+    
+    <div>
+        <label>Name: <input type="text" id="name" value="Test User" /></label><br>
+        <label>Email: <input type="email" id="email" value="" /></label><br>
+        <label>Password: <input type="password" id="password" value="password123" /></label><br>
+        <button onclick="testRegistration()">Test Registration</button>
+        <button onclick="clearResult()">Clear</button>
+    </div>
+    
+    <div id="result" class="result" style="display: none;"></div>
+
+    <script>
+        // Generate random email on load
+        document.getElementById('email').value = `test${Date.now()}@example.com`;
+        
+        function clearResult() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'none';
+            resultDiv.className = 'result';
+        }
+        
+        function showResult(message, isSuccess = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.style.display = 'block';
+        }
+        
+        async function testRegistration() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!name || !email || !password) {
+                showResult('Please fill in all fields');
+                return;
+            }
+            
+            showResult('Testing registration...', false);
+            
+            try {
+                console.log('Making registration request to:', 'http://localhost:3001/api/auth/register');
+                console.log('Request body:', { name, email, password: '[HIDDEN]' });
+                
+                const response = await fetch('http://localhost:3001/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    showResult(`
+                        <h3>✅ Registration Successful!</h3>
+                        <p><strong>Message:</strong> ${data.message}</p>
+                        <p><strong>User ID:</strong> ${data.user.id}</p>
+                        <p><strong>Email:</strong> ${data.user.email}</p>
+                        <p><strong>Name:</strong> ${data.user.name}</p>
+                        <p><strong>Token:</strong> ${data.token ? data.token.substring(0, 20) + '...' : 'None'}</p>
+                    `, true);
+                    
+                    // Generate new email for next test
+                    document.getElementById('email').value = `test${Date.now()}@example.com`;
+                } else {
+                    showResult(`
+                        <h3>❌ Registration Failed</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                        <p><strong>Message:</strong> ${data.message || 'No message'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `);
+                }
+                
+            } catch (error) {
+                console.error('Registration test failed:', error);
+                showResult(`
+                    <h3>❌ Network Error</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p>This might be a CORS error or the backend is not accessible.</p>
+                    <p>Check the browser's developer console for more details.</p>
+                `);
+            }
+        }
+    </script>
+</body>
+</html>

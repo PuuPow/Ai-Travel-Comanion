@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:./dev.db
+      - PORT=3001
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - database
+    networks:
+      - travel-planner
+
+  # Frontend Next.js Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://backend:3001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - travel-planner
+
+  # Database Service (SQLite is file-based, but we can use PostgreSQL for production)
+  database:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=travel_planner
+      - POSTGRES_PASSWORD=travel_password
+      - POSTGRES_DB=travel_planner_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - travel-planner
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - travel-planner
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  travel-planner:
+    driver: bridge
