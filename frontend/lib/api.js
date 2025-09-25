@@ -1,18 +1,15 @@
 // API utility functions for consistent API URL handling
 
 export const getApiUrl = () => {
-  if (typeof window === 'undefined') {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  // For Vercel deployment, API routes are on the same domain
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
   }
   
-  // If we have an environment variable, use it
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  
-  // Otherwise, use the current host but with port 3001
-  const currentHost = window.location.hostname;
-  return `http://${currentHost}:3001`;
+  // For server-side rendering
+  return process.env.NEXT_PUBLIC_API_URL || process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : 'http://localhost:3000';
 };
 
 // Helper function for making authenticated API requests
