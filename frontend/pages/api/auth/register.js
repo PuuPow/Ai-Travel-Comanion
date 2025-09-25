@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const prisma = new PrismaClient();
+// Simple in-memory user store (for demo purposes)
+let users = [];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -22,9 +22,7 @@ export default async function handler(req, res) {
     }
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    const existingUser = users.find(u => u.email === email);
 
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists with this email' });
@@ -35,13 +33,15 @@ export default async function handler(req, res) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name: name || null
-      }
-    });
+    const user = {
+      id: Date.now().toString(),
+      email,
+      password: hashedPassword,
+      name: name || null,
+      createdAt: new Date().toISOString()
+    };
+
+    users.push(user);
 
     // Generate JWT token
     const token = jwt.sign(

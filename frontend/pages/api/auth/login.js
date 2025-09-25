@@ -1,8 +1,15 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const prisma = new PrismaClient();
+// Temporary in-memory user store (replace with database later)
+const users = [
+  {
+    id: '1',
+    email: 'test@example.com',
+    name: 'Test User',
+    password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi' // password: 'password'
+  }
+];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -18,9 +25,7 @@ export default async function handler(req, res) {
     }
 
     // Find user
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
+    const user = users.find(u => u.email === email);
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
