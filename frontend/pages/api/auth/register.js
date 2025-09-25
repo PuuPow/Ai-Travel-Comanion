@@ -1,8 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
-// Simple in-memory user store (for demo purposes)
-let users = [];
+import { findUserByEmail, addUser } from '../../../lib/userStore';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -22,7 +20,7 @@ export default async function handler(req, res) {
     }
 
     // Check if user already exists
-    const existingUser = users.find(u => u.email === email);
+    const existingUser = findUserByEmail(email);
 
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists with this email' });
@@ -41,7 +39,7 @@ export default async function handler(req, res) {
       createdAt: new Date().toISOString()
     };
 
-    users.push(user);
+    addUser(user);
 
     // Generate JWT token
     const token = jwt.sign(
