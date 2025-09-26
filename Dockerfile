@@ -48,8 +48,9 @@ USER nextjs
 EXPOSE 3000
 
 # Set environment variables
-ENV JWT_SECRET="53b81d229a621a49909f3eb9170dd074c2c561909ba301ff68fae030f989c031a663262eed1e0a6afbe86a9aef09a4465f67a681495e697e0bb466e5934ecd8e"
-ENV DATABASE_URL="file:./dev.db"
 ENV NODE_ENV="production"
+
+# Google Cloud Run requires PORT env var
+ENV PORT=${PORT:-3000}
 
 CMD ["node", "server.js"]
