@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getApiUrl } from '../lib/api';
 
 const AuthContext = createContext();
 
@@ -36,10 +35,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      const apiUrl = getApiUrl();
-      console.log('Login API URL:', apiUrl);
-      
-      const response = await fetch(`${apiUrl}/api/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,10 +72,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      const apiUrl = getApiUrl();
-      console.log('Register API URL:', apiUrl);
-      
-      const response = await fetch(`${apiUrl}/api/auth/register`, {
+      const response = await fetch(`/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

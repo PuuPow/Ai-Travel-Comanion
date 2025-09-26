@@ -1,19 +1,13 @@
 // API utility functions for consistent API URL handling
 
 export const getApiUrl = () => {
-  // For deployed app, API routes are always on the same domain
-  // Client-side: use current domain
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
-  }
-  
-  // Server-side: return empty string to use relative URLs
+  // Always return empty string for API routes on same domain
+  // This works for both client-side and server-side rendering
   return '';
 };
 
 // Helper function for making authenticated API requests
 export const fetchWithAuth = async (endpoint, options = {}) => {
-  const apiUrl = getApiUrl();
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
   
   const config = {
@@ -25,7 +19,8 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
     },
   };
   
-  const response = await fetch(`${apiUrl}${endpoint}`, config);
+  // Use relative URLs - endpoint should start with /api/
+  const response = await fetch(endpoint, config);
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
