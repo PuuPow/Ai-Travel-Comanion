@@ -18,4 +18,5 @@ ENV PORT=${PORT:-3000}
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Use Next.js production server
+CMD ["npx", "next", "start", "-p", "3000"]

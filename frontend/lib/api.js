@@ -1,19 +1,14 @@
 // API utility functions for consistent API URL handling
 
 export const getApiUrl = () => {
+  // For deployed app, API routes are always on the same domain
   // Client-side: use current domain
   if (typeof window !== 'undefined') {
-    const origin = window.location.origin;
-    console.log('Client-side API URL:', origin);
-    return origin;
+    return window.location.origin;
   }
   
-  // Server-side: use environment variable or default
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
-                 (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-  
-  console.log('Server-side API URL:', apiUrl);
-  return apiUrl;
+  // Server-side: return empty string to use relative URLs
+  return '';
 };
 
 // Helper function for making authenticated API requests
