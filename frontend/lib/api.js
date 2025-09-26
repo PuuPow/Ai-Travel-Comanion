@@ -1,15 +1,19 @@
 // API utility functions for consistent API URL handling
 
 export const getApiUrl = () => {
-  // For Vercel deployment, API routes are on the same domain
+  // Client-side: use current domain
   if (typeof window !== 'undefined') {
-    return window.location.origin;
+    const origin = window.location.origin;
+    console.log('Client-side API URL:', origin);
+    return origin;
   }
   
-  // For server-side rendering
-  return process.env.NEXT_PUBLIC_API_URL || process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : 'http://localhost:3000';
+  // Server-side: use environment variable or default
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
+                 (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+  
+  console.log('Server-side API URL:', apiUrl);
+  return apiUrl;
 };
 
 // Helper function for making authenticated API requests
