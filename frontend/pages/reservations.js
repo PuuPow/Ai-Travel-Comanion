@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { FaPlane, FaCalendarAlt, FaMapMarkerAlt, FaEye, FaPlus, FaBrain } from 'react-icons/fa';
+import { FaPlane, FaCalendarAlt, FaMapMarkerAlt, FaEye, FaPlus, FaBrain, FaBars, FaTimes, FaHome, FaUser, FaSignOutAlt, FaBox } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 import AIBookingAssistant from '../components/AIBookingAssistant';
@@ -18,6 +18,7 @@ export default function Reservations() {
   const [showManualBooking, setShowManualBooking] = useState(false);
   const [bookings, setBookings] = useState([]);
   const [selectedItineraryForBooking, setSelectedItineraryForBooking] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
   const router = useRouter();
@@ -145,10 +146,12 @@ export default function Reservations() {
               <div className="flex items-center">
                 <Link href="/" className="flex items-center">
                   <FaPlane className="text-white text-xl mr-2" />
-                  <h1 className="text-xl font-bold text-white">AI Travel Companion</h1>
+                  <h1 className="text-lg sm:text-xl font-bold text-white">AI Travel Companion</h1>
                 </Link>
               </div>
-              <div className="flex items-center space-x-4">
+              
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-4">
                 <Link href="/itineraries" className="text-white/90 hover:text-white font-medium transition-colors">
                   My Trips
                 </Link>
@@ -168,17 +171,66 @@ export default function Reservations() {
                   Logout
                 </button>
               </div>
+              
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden text-white p-2"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+              </button>
             </div>
+            
+            {/* Mobile Menu */}
+            {mobileMenuOpen && (
+              <div className="md:hidden mt-4 pb-4 border-t border-white/20">
+                <nav className="flex flex-col space-y-3 pt-4">
+                  <Link href="/" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                    <FaHome className="mr-3" />
+                    Home
+                  </Link>
+                  <Link href="/itineraries" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                    <FaPlane className="mr-3" />
+                    My Trips
+                  </Link>
+                  <Link href="/reservations" className="flex items-center text-white font-medium py-2">
+                    <FaCalendarAlt className="mr-3" />
+                    Reservations
+                  </Link>
+                  <Link href="/packing" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                    <FaBox className="mr-3" />
+                    Smart Packing
+                  </Link>
+                  <Link href="/account" className="flex items-center text-white/90 hover:text-white transition-colors py-2">
+                    <FaUser className="mr-3" />
+                    Hi, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center text-white/90 hover:text-red-200 font-medium transition-colors py-2 text-left"
+                  >
+                    <FaSignOutAlt className="mr-3" />
+                    Logout
+                  </button>
+                </nav>
+              </div>
+            )}
           </div>
         </header>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Reservations</h1>
+          <div className="mb-8">
+            <div className="text-center md:text-left mb-6">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Reservations</h1>
               <p className="text-gray-600 mt-2">AI-powered booking assistance for your travel adventures</p>
             </div>
-            <div className="flex items-center space-x-4">
+            
+            {/* Action Buttons - Mobile First */}
+            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-end gap-3 sm:gap-4">
               <button
                 onClick={() => {
                   setShowAIAssistant(!showAIAssistant);
@@ -186,7 +238,7 @@ export default function Reservations() {
                     setSelectedItinerary(itineraries[0]);
                   }
                 }}
-                className={`inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg transition-colors ${
+                className={`w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg transition-colors ${
                   showAIAssistant 
                     ? 'text-white bg-purple-600 hover:bg-purple-700' 
                     : 'text-purple-600 bg-purple-50 hover:bg-purple-100'
@@ -197,7 +249,7 @@ export default function Reservations() {
               </button>
               <Link
                 href="/itineraries/new"
-                className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 <FaPlus className="mr-2" />
                 New Trip
@@ -278,26 +330,26 @@ export default function Reservations() {
                   key={itinerary.id}
                   className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
                 >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
+                  <div className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-4">
+                      <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
                           {itinerary.title}
                         </h3>
-                        <div className="flex items-center text-gray-600 space-x-4 text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center text-gray-600 space-y-1 sm:space-y-0 sm:space-x-4 text-sm">
                           <div className="flex items-center">
-                            <FaMapMarkerAlt className="mr-1" />
-                            <span>{itinerary.destination}</span>
+                            <FaMapMarkerAlt className="mr-1 flex-shrink-0" />
+                            <span className="truncate">{itinerary.destination}</span>
                           </div>
                           <div className="flex items-center">
-                            <FaCalendarAlt className="mr-1" />
-                            <span>{formatDate(itinerary.startDate)} - {formatDate(itinerary.endDate)}</span>
+                            <FaCalendarAlt className="mr-1 flex-shrink-0" />
+                            <span className="text-xs sm:text-sm">{formatDate(itinerary.startDate)} - {formatDate(itinerary.endDate)}</span>
                           </div>
                         </div>
                       </div>
                       <Link
                         href={`/itineraries/${itinerary.id}`}
-                        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                        className="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors flex-shrink-0"
                       >
                         <FaEye className="mr-1.5" />
                         View Trip
@@ -327,17 +379,17 @@ export default function Reservations() {
                       <div className="mt-4">
                         {/* Show actual bookings if any */}
                         {getBookingsForItinerary(itinerary.id).length > 0 ? (
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
+                            <div className="space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                               <h4 className="font-medium text-gray-900">Your Bookings ({getBookingsForItinerary(itinerary.id).length})</h4>
                               <button
                                 onClick={() => {
                                   setSelectedItineraryForBooking(itinerary);
                                   setShowManualBooking(true);
                                 }}
-                                className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+                                className="w-full sm:w-auto text-sm bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors flex items-center justify-center"
                               >
-                                <FaPlus className="inline mr-1" /> Add Booking
+                                <FaPlus className="mr-2" /> Add Booking
                               </button>
                             </div>
                             {getBookingsForItinerary(itinerary.id).map((booking) => (
@@ -351,14 +403,14 @@ export default function Reservations() {
                           </div>
                         ) : (
                           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div className="flex items-center justify-between mb-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                               <p className="text-blue-900 font-medium">Ready for Reservations!</p>
                               <button
                                 onClick={() => {
                                   setSelectedItineraryForBooking(itinerary);
                                   setShowManualBooking(true);
                                 }}
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center text-sm"
+                                className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center text-sm"
                               >
                                 <FaPlus className="mr-2" /> Add First Booking
                               </button>
