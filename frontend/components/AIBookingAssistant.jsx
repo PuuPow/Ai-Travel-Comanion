@@ -354,8 +354,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                           ))}
                         </div>
                       </div>
-                      ))}
-                    </div>
+                    ))}
                   </div>
                 </div>
               )}
