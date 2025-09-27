@@ -108,6 +108,26 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
     });
   };
 
+  // Generate URL for recommendation platform
+  const getPlatformUrl = (platform, accommodationType = 'hotel') => {
+    if (!itinerary) return '#';
+    
+    const { destination, startDate, endDate } = itinerary;
+    
+    switch (platform.toLowerCase()) {
+      case 'booking':
+        return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destination)}&checkin=${startDate}&checkout=${endDate}&group_adults=${guests}&no_rooms=${rooms}`;
+      case 'expedia':
+        const checkInFormatted = new Date(startDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+        const checkOutFormatted = new Date(endDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+        return `https://www.expedia.com/Hotel-Search?destination=${encodeURIComponent(destination)}&startDate=${checkInFormatted}&endDate=${checkOutFormatted}&adults=${guests}&rooms=${rooms}`;
+      case 'hotels':
+        return `https://www.hotels.com/search.do?q-destination=${encodeURIComponent(destination)}&q-check-in=${startDate}&q-check-out=${endDate}&q-rooms=${rooms}&q-room-0-adults=${guests}`;
+      default:
+        return `https://www.google.com/search?q=${encodeURIComponent(destination + ' hotels')}`;
+    }
+  };
+
 
   if (!itinerary) {
     return (
@@ -202,9 +222,19 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                         </div>
                         <div className="flex flex-wrap gap-1 sm:flex-nowrap sm:space-x-1">
                           {rec.platforms.map((platform) => (
-                            <span key={platform} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded whitespace-nowrap">
-                              {platform}
-                            </span>
+                            <a
+                              key={platform}
+                              href={getPlatformUrl(platform, rec.type)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 hover:text-blue-900 px-2 py-1 rounded whitespace-nowrap transition-colors cursor-pointer inline-flex items-center"
+                            >
+                              {platform === 'booking' ? 'Booking.com' : 
+                               platform === 'expedia' ? 'Expedia' : 
+                               platform === 'hotels' ? 'Hotels.com' : 
+                               platform.charAt(0).toUpperCase() + platform.slice(1)}
+                              <FaExternalLinkAlt className="ml-1 text-xs opacity-60" />
+                            </a>
                           ))}
                         </div>
                       </div>
