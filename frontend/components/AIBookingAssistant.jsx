@@ -275,7 +275,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                 <div className="flex items-center">
                   <FaHotel className="text-blue-500 mr-3" />
                   <h4 className="font-semibold text-gray-900">Accommodation Options</h4>
-                  <span className="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                  <span className="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap">
                     {bookingOptions.accommodations.length} platforms
                   </span>
                 </div>
@@ -331,7 +331,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                 <div className="flex items-center">
                   <FaPlane className="text-indigo-500 mr-3" />
                   <h4 className="font-semibold text-gray-900">Flight Options</h4>
-                  <span className="ml-2 text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
+                  <span className="ml-2 text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full whitespace-nowrap">
                     {bookingOptions.flights.length} platforms
                   </span>
                 </div>
@@ -387,7 +387,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                 <div className="flex items-center">
                   <span className="text-green-500 mr-3 text-xl">🚗</span>
                   <h4 className="font-semibold text-gray-900">Car Rental Options</h4>
-                  <span className="ml-2 text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                  <span className="ml-2 text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full whitespace-nowrap">
                     {bookingOptions.carRentals.length} platforms
                   </span>
                 </div>
@@ -443,7 +443,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                 <div className="flex items-center">
                   <span className="text-purple-500 mr-3 text-xl">🎭</span>
                   <h4 className="font-semibold text-gray-900">Activities & Tours</h4>
-                  <span className="ml-2 text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                  <span className="ml-2 text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded-full whitespace-nowrap">
                     {bookingOptions.activities.length} platforms
                   </span>
                 </div>
@@ -499,7 +499,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                 <div className="flex items-center">
                   <FaShieldAlt className="text-orange-500 mr-3" />
                   <h4 className="font-semibold text-gray-900">Travel Insurance</h4>
-                  <span className="ml-2 text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                  <span className="ml-2 text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded-full whitespace-nowrap">
                     {bookingOptions.insurance.length} providers
                   </span>
                 </div>
