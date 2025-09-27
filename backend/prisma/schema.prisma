@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -18,9 +18,22 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
+  // Premium subscription fields
+  subscriptionStatus String @default("free") // "free", "premium", "cancelled", "expired"
+  subscriptionId String? // PayPal subscription ID
+  subscriptionStartDate DateTime?
+  subscriptionEndDate DateTime?
+  paypalCustomerId String?
+  
   itineraries Itinerary[]
   reservations Reservation[]
   packingLists PackingList[]
+  payments Payment[]
+  
+  // Sharing relations
+  sharesCreated ItineraryShare[] @relation("ShareCreator")
+  collaborations ItineraryCollaborator[]
+  collaborationsAdded ItineraryCollaborator[] @relation("CollaboratorAdder")
 }
 
 model Itinerary {
@@ -40,6 +53,10 @@ model Itinerary {
   days        Day[]
   reservations Reservation[]
   packingList PackingList?
+  
+  // Sharing relations
+  shares      ItineraryShare[]
+  collaborators ItineraryCollaborator[]
 }
 
 model Day {
@@ -47,6 +64,7 @@ model Day {
   date        DateTime
   dayNumber   Int
   activities  String // JSON string of activity objects
+  meals       String? // JSON string of meal recommendations (breakfast, lunch, dinner)
   notes       String?
   
   itineraryId String
@@ -84,4 +102,69 @@ model PackingList {
   
   itineraryId String @unique
   itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+}
+
+model ItineraryShare {
+  id          String @id @default(cuid())
+  shareToken  String @unique
+  permissions String @default("read") // "read", "edit", "admin"
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  
+  itineraryId String
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  
+  createdById String
+  createdBy   User @relation("ShareCreator", fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model ItineraryCollaborator {
+  id          String @id @default(cuid())
+  permissions String @default("edit") // "read", "edit", "admin"
+  addedAt     DateTime @default(now())
+  
+  itineraryId String
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  
+  userId      String
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  addedById   String
+  addedBy     User @relation("CollaboratorAdder", fields: [addedById], references: [id], onDelete: Cascade)
+  
+  @@unique([itineraryId, userId])
+}
+
+model Payment {
+  id                String @id @default(cuid())
+  paypalOrderId     String @unique
+  paypalPaymentId   String?
+  amount            Float
+  currency          String @default("USD")
+  status            String // "pending", "completed", "failed", "cancelled", "refunded"
+  type              String // "one-time", "subscription", "upgrade"
+  description       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  userId            String
+  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // PayPal specific data
+  paypalData        String? // JSON string of PayPal response
+}
+
+model SubscriptionPlan {
+  id          String @id @default(cuid())
+  name        String // "Premium Monthly", "Premium Yearly"
+  description String?
+  price       Float
+  currency    String @default("USD")
+  interval    String // "month", "year"
+  paypalPlanId String @unique // PayPal plan ID
+  features    String // JSON array of features
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -2,9 +2,12 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { FaArrowLeft, FaEdit, FaCalendarAlt, FaMapMarkerAlt, FaClock, FaPlane, FaStar, FaUtensils, FaCamera } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaCalendarAlt, FaMapMarkerAlt, FaClock, FaPlane, FaStar, FaUtensils, FaCamera, FaFileExport, FaBell } from 'react-icons/fa';
 import { format } from 'date-fns';
 import DayPlanEditor from '../../components/DayPlanEditor';
+import WeatherWidget from '../../components/WeatherWidget';
+import ExportModal from '../../components/ExportModal';
+import NotificationWidget from '../../components/NotificationWidget';
 
 export default function ItineraryDetail() {
   const router = useRouter();
@@ -14,6 +17,8 @@ export default function ItineraryDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingDay, setEditingDay] = useState(null);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [weatherData, setWeatherData] = useState(null);
 
   useEffect(() => {
     if (id) {
@@ -101,6 +106,35 @@ export default function ItineraryDetail() {
       
     } catch (err) {
       alert('Error generating suggestions: ' + err.message);
+    }
+  };
+
+  const handleNotificationAction = (action, notification) => {
+    console.log('Notification action:', action, notification);
+    
+    switch (action) {
+      case 'open_airline_website':
+        // In a real app, this would open the specific airline website
+        window.open('https://www.google.com/flights', '_blank');
+        break;
+      case 'set_departure_reminder':
+        alert('Departure reminder set! You\'ll be notified 3 hours before your flight.');
+        break;
+      case 'check_traffic':
+        window.open(`https://maps.google.com?q=${encodeURIComponent(itinerary.destination)}`, '_blank');
+        break;
+      case 'call_ride':
+        alert('Opening ride booking options...');
+        break;
+      case 'view':
+        // Scroll to relevant section or open details
+        console.log('View notification details:', notification);
+        break;
+      case 'dismiss':
+        console.log('Notification dismissed:', notification.title);
+        break;
+      default:
+        console.log('Unknown notification action:', action);
     }
   };
 
@@ -216,22 +250,47 @@ export default function ItineraryDetail() {
             </div>
           )}
           
-          {/* Action Buttons - Moved under description */}
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+          {/* Action Buttons - Enhanced with sharing and export */}
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mt-8">
             <button
               onClick={handleGenerateSuggestions}
-              className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-purple-300"
+              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-sm sm:text-base font-semibold rounded-xl text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-purple-300"
             >
               ✨ AI Suggestions
             </button>
             <Link
               href={`/itineraries/${id}/edit`}
-              className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
+              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-sm sm:text-base font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
             >
               <FaEdit className="mr-2" />
               Edit Adventure
             </Link>
+            <button
+              onClick={() => setExportModalOpen(true)}
+              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-sm sm:text-base font-semibold rounded-xl text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-300"
+            >
+              <FaFileExport className="mr-2" />
+              Export
+            </button>
           </div>
+        </div>
+
+        {/* Weather Widget */}
+        <div className="mb-8">
+          <WeatherWidget 
+            destination={itinerary.destination}
+            startDate={itinerary.startDate}
+            endDate={itinerary.endDate}
+          />
+        </div>
+
+        {/* Notification Widget */}
+        <div className="mb-8">
+          <NotificationWidget 
+            itinerary={itinerary}
+            weatherData={weatherData}
+            onNotificationAction={handleNotificationAction}
+          />
         </div>
 
         {/* Days */}
@@ -459,6 +518,13 @@ export default function ItineraryDetail() {
           </div>
         )}
       </main>
+
+      {/* Modals */}
+      <ExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        itinerary={itinerary}
+      />
     </div>
   );
 }

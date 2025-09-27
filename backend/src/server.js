@@ -13,13 +13,28 @@ const prisma = new PrismaClient({
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'http://192.168.1.2:3000',
-    'http://192.168.1.58:3000',
-    'http://192.168.1.95:3000',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost and any IP on port 3000 (for development)
+    if (origin.match(/^http:\/\/(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):3000$/)) {
+      return callback(null, true);
+    }
+    
+    // Allow specific configured origins
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://192.168.1.22:3000',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -71,6 +86,9 @@ app.get('/', (req, res) => {
     endpoints: [
       '/api/auth',
       '/api/itineraries',
+      '/api/meals',
+      '/api/share',
+      '/api/payments',
       '/health'
     ]
   });
@@ -79,10 +97,16 @@ app.get('/', (req, res) => {
 // Use modular routes with Google Places integration
 const authRoutes = require('./routes/auth');
 const itineraryRoutes = require('./routes/itineraries');
+const mealsRoutes = require('./routes/meals');
+const shareRoutes = require('./routes/share');
+const paymentRoutes = require('./routes/payments');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/itineraries', itineraryRoutes);
+app.use('/api/meals', mealsRoutes);
+app.use('/api/share', shareRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

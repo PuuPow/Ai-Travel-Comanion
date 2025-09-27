@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
-import { FaPlane, FaCalendarAlt, FaMapMarkerAlt, FaPlus, FaEye, FaEdit, FaTrash, FaSpinner, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaPlane, FaCalendarAlt, FaMapMarkerAlt, FaPlus, FaStar, FaFileExport, FaBell, FaEye, FaEdit, FaTrash, FaTimes, FaCheck, FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
 
 export default function Itineraries() {
@@ -52,12 +52,20 @@ export default function Itineraries() {
         
         // Get the auth token from localStorage
         const token = localStorage.getItem('auth_token');
-        console.log('🔧 API URL:', process.env.NEXT_PUBLIC_API_URL);
-        console.log('🔧 Has auth token:', !!token);
-        console.log('🔧 Token preview:', token ? `${token.substring(0, 20)}...` : 'No token');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         
-        // Make direct fetch call with auth token for demo mode
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/itineraries`, {
+        // Enhanced mobile debugging
+        console.log('🔧 Mobile Debug Info:');
+        console.log('  - API URL:', apiUrl);
+        console.log('  - Has auth token:', !!token);
+        console.log('  - Token preview:', token ? `${token.substring(0, 20)}...` : 'No token');
+        console.log('  - User agent:', navigator.userAgent);
+        console.log('  - Window location:', window.location.href);
+        console.log('  - Is mobile:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+        
+        // Make direct fetch call with auth token
+        console.log('🚀 Making request to:', `${apiUrl}/api/itineraries`);
+        const response = await fetch(`${apiUrl}/api/itineraries`, {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json'
@@ -66,7 +74,12 @@ export default function Itineraries() {
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-          console.error('API Error:', response.status, errorData);
+          console.error('🚨 API Error Details:');
+          console.error('  - Status:', response.status);
+          console.error('  - Status Text:', response.statusText);
+          console.error('  - Headers:', Object.fromEntries(response.headers.entries()));
+          console.error('  - Error Data:', errorData);
+          console.error('  - Request URL:', response.url);
           throw new Error(errorData.error || `Failed to fetch itineraries (${response.status})`);
         }
         

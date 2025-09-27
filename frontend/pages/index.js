@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { FaPlane, FaCalendarAlt, FaSuitcase, FaMapMarkedAlt, FaArrowRight, FaPlus, FaBrain, FaUser } from 'react-icons/fa';
+import { FaPlane, FaCalendarAlt, FaSuitcase, FaMapMarkedAlt, FaArrowRight, FaPlus, FaBrain, FaUser, FaCrown } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
@@ -49,6 +49,11 @@ export default function Home() {
                   <Link href="/reservations" className="text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base hidden md:inline-block">
                     <span className="hidden lg:inline">Reservations</span>
                     <span className="lg:hidden">Bookings</span>
+                  </Link>
+                  <Link href="/premium" className="text-yellow-300 hover:text-yellow-200 font-medium transition-colors text-sm sm:text-base flex items-center">
+                    <FaCrown className="mr-1 text-xs" />
+                    <span className="hidden sm:inline">Premium</span>
+                    <span className="sm:hidden">Pro</span>
                   </Link>
                   <Link href="/account" className="text-white/90 hover:text-white text-xs sm:text-sm hidden lg:inline truncate transition-colors cursor-pointer hover:underline">
                     Hi, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
@@ -147,18 +152,34 @@ export default function Home() {
             <Link href="/itineraries" className="group relative block overflow-hidden rounded-3xl shadow-2xl transition-all duration-500 transform hover:scale-105 h-96">
               <div className="absolute inset-0">
                 <img 
-                  src="https://images.unsplash.com/photo-1539650116574-75c0c6d73901?w=540&h=960&fit=crop&q=80"
-                  alt="Smart Itineraries"
+                  src="https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?w=540&h=960&fit=crop&q=80"
+                  alt="Smart AI-powered travel itineraries with digital planning"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black opacity-50 to-transparent group-hover:opacity-40 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-60 group-hover:opacity-50 transition-opacity duration-300"></div>
+                {/* AI Brain overlay effect */}
+                <div className="absolute top-6 right-6 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                  <FaBrain className="text-blue-300 text-3xl animate-pulse" />
+                </div>
               </div>
               <div className="relative h-full flex flex-col justify-center items-center p-6 text-center">
-                <FaMapMarkedAlt className="text-white text-5xl mb-4 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 group-hover:text-blue-200 transition-colors duration-300">Smart Itineraries</h3>
-                <p className="text-gray-100 text-base md:text-lg leading-relaxed font-medium">
-                  AI-powered travel planning that creates personalized day-by-day itineraries for your trips.
+                <div className="relative">
+                  <FaMapMarkedAlt className="text-white text-5xl mb-4 group-hover:scale-110 transition-transform duration-300 drop-shadow-lg" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center group-hover:bg-blue-400 transition-colors">
+                    <span className="text-white text-xs font-bold">AI</span>
+                  </div>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 group-hover:text-blue-200 transition-colors duration-300 drop-shadow-md">
+                  Smart Itineraries
+                </h3>
+                <p className="text-gray-100 text-base md:text-lg leading-relaxed font-medium drop-shadow-sm">
+                  AI-powered travel planning that creates personalized day-by-day itineraries with local insights and real-time optimization.
                 </p>
+                <div className="mt-4 flex items-center justify-center space-x-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-blue-200 font-medium">Powered by AI</span>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse delay-75"></div>
+                </div>
               </div>
             </Link>
 
