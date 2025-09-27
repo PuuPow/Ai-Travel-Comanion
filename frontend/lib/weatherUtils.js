@@ -1,14 +1,27 @@
 /**
  * Weather Utilities
- * Fetches weather data for travel destinations
+ * Fetches weather data for travel destinations with multiple API fallbacks
  */
 
-const WEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || 'demo_key';
-const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
-const WEATHER_HISTORY_URL = 'https://history.openweathermap.org/data/2.5';
-const WEATHER_CLIMATE_URL = 'http://climateapi.openweathermap.org/data/1.5';
+// Primary API: OpenWeatherMap (Free tier: 60 calls/minute, 1M calls/month)
+const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || '';
+const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
-// Fallback weather data for demo purposes when API key is not available
+// Fallback API: WeatherAPI.com (Free tier: 1M calls/month)
+const WEATHERAPI_KEY = process.env.NEXT_PUBLIC_WEATHERAPI_KEY || '';
+const WEATHERAPI_BASE_URL = 'https://api.weatherapi.com/v1';
+
+// Fallback API: MeteoSource (Free tier: 1000 calls/day)
+const METEOSOURCE_KEY = process.env.NEXT_PUBLIC_METEOSOURCE_KEY || '';
+const METEOSOURCE_BASE_URL = 'https://www.meteosource.com/api/v1/free';
+
+// Free API: Open-Meteo (No API key required, unlimited)
+const OPEN_METEO_BASE_URL = 'https://api.open-meteo.com/v1';
+
+// For geocoding (converting city names to coordinates)
+const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org';
+
+// Enhanced demo weather data with location-based variations
 const DEMO_WEATHER_DATA = {
   temperature: 22,
   description: 'partly cloudy',
@@ -16,6 +29,136 @@ const DEMO_WEATHER_DATA = {
   humidity: 65,
   windSpeed: 3.2,
   feelsLike: 24
+};
+
+/**
+ * Get coordinates for a location using free Nominatim geocoding
+ */
+const getCoordinates = async (location) => {
+  try {
+    const response = await fetch(
+      `${NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(location)}&format=json&limit=1&addressdetails=1`,
+      {
+        headers: {
+          'User-Agent': 'Travel-Planner-App/1.0'
+        }
+      }
+    );
+    
+    if (!response.ok) throw new Error('Geocoding failed');
+    
+    const data = await response.json();
+    if (data.length === 0) throw new Error('Location not found');
+    
+    return {
+      lat: parseFloat(data[0].lat),
+      lon: parseFloat(data[0].lon),
+      name: data[0].display_name.split(',')[0],
+      country: data[0].address?.country || 'Unknown'
+    };
+  } catch (error) {
+    console.error('Geocoding error:', error);
+    return null;
+  }
+};
+
+/**
+ * Fetch weather from Open-Meteo (free, no API key required)
+ */
+const getWeatherFromOpenMeteo = async (lat, lon) => {
+  try {
+    const response = await fetch(
+      `${OPEN_METEO_BASE_URL}/forecast?` +
+      `latitude=${lat}&longitude=${lon}&current_weather=true&` +
+      `daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&` +
+      `timezone=auto&forecast_days=7`
+    );
+    
+    if (!response.ok) throw new Error('Open-Meteo API error');
+    
+    const data = await response.json();
+    const current = data.current_weather;
+    
+    // Map Open-Meteo weather codes to descriptions
+    const weatherCodes = {
+      0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+      45: 'Fog', 48: 'Depositing rime fog',
+      51: 'Light drizzle', 53: 'Moderate drizzle', 55: 'Dense drizzle',
+      61: 'Slight rain', 63: 'Moderate rain', 65: 'Heavy rain',
+      71: 'Slight snow', 73: 'Moderate snow', 75: 'Heavy snow',
+      80: 'Slight showers', 81: 'Moderate showers', 82: 'Violent showers',
+      95: 'Thunderstorm', 96: 'Thunderstorm with hail'
+    };
+    
+    // Map weather codes to OpenWeather-style icons
+    const getIconCode = (code, isDay) => {
+      const prefix = isDay ? 'd' : 'n';
+      if (code === 0) return `01${prefix}`; // clear
+      if (code <= 2) return `02${prefix}`; // partly cloudy
+      if (code === 3) return `04${prefix}`; // overcast
+      if (code >= 45 && code <= 48) return `50${prefix}`; // fog
+      if (code >= 51 && code <= 65) return `10${prefix}`; // rain
+      if (code >= 71 && code <= 75) return `13${prefix}`; // snow
+      if (code >= 80 && code <= 82) return `09${prefix}`; // showers
+      if (code >= 95) return `11${prefix}`; // thunderstorm
+      return `02${prefix}`; // default
+    };
+    
+    return {
+      temperature: Math.round(current.temperature),
+      description: weatherCodes[current.weathercode] || 'Unknown',
+      icon: getIconCode(current.weathercode, current.is_day),
+      windSpeed: current.windspeed / 3.6, // Convert km/h to m/s
+      humidity: 60, // Open-Meteo doesn't provide current humidity
+      feelsLike: Math.round(current.temperature), // Simplified
+      visibility: 10,
+      pressure: 1013,
+      forecasts: data.daily ? data.daily.time.map((date, i) => ({
+        date,
+        minTemp: Math.round(data.daily.temperature_2m_min[i]),
+        maxTemp: Math.round(data.daily.temperature_2m_max[i]),
+        description: weatherCodes[data.daily.weathercode[i]] || 'Unknown',
+        icon: getIconCode(data.daily.weathercode[i], true),
+        humidity: data.daily.precipitation_probability_max[i] || 50
+      })).slice(0, 5) : []
+    };
+  } catch (error) {
+    console.error('Open-Meteo error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch weather from OpenWeatherMap
+ */
+const getWeatherFromOpenWeather = async (location) => {
+  if (!OPENWEATHER_API_KEY) throw new Error('No OpenWeatherMap API key');
+  
+  try {
+    const response = await fetch(
+      `${OPENWEATHER_BASE_URL}/weather?q=${encodeURIComponent(location)}&appid=${OPENWEATHER_API_KEY}&units=metric`
+    );
+    
+    if (!response.ok) throw new Error(`OpenWeatherMap error: ${response.status}`);
+    
+    const data = await response.json();
+    
+    return {
+      temperature: Math.round(data.main.temp),
+      feelsLike: Math.round(data.main.feels_like),
+      description: data.weather[0].description,
+      icon: data.weather[0].icon,
+      humidity: data.main.humidity,
+      windSpeed: data.wind.speed,
+      visibility: data.visibility / 1000,
+      pressure: data.main.pressure,
+      sunrise: new Date(data.sys.sunrise * 1000),
+      sunset: new Date(data.sys.sunset * 1000)
+    };
+  } catch (error) {
+    console.error('OpenWeatherMap error:', error);
+    throw error;
+  }
 };
 
 /**
