@@ -31,6 +31,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
   const [expandedSections, setExpandedSections] = useState({
     recommendations: true,
     accommodations: false,
+    allPlatforms: false,
     flights: false,
     carRentals: false,
     activities: false,
@@ -295,25 +296,34 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
             )}
           </div>
 
-          {/* Accommodation Options */}
+          {/* All Booking Platforms */}
           {bookingOptions && (
             <div className="bg-white rounded-lg border border-gray-200">
               <div 
                 className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 border-b border-gray-200"
-                onClick={() => toggleSection('accommodations')}
+                onClick={() => toggleSection('allPlatforms')}
               >
                 <div className="flex items-center">
-                  <FaHotel className="text-blue-500 mr-3" />
-                  <h4 className="font-semibold text-gray-900">Accommodation Options</h4>
-                  <span className="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap">
+                  <FaHotel className="text-gray-500 mr-3" />
+                  <h4 className="font-semibold text-gray-900">All Booking Platforms</h4>
+                  <span className="ml-2 text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded-full whitespace-nowrap">
                     {bookingOptions.accommodations.length} platforms
                   </span>
+                  <span className="ml-2 text-xs text-gray-500 hidden sm:inline">
+                    • Complete list
+                  </span>
                 </div>
-                {expandedSections.accommodations ? <FaChevronUp /> : <FaChevronDown />}
+                {expandedSections.allPlatforms ? <FaChevronUp /> : <FaChevronDown />}
               </div>
 
-              {expandedSections.accommodations && (
+              {expandedSections.allPlatforms && (
                 <div className="p-4">
+                  <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-sm text-gray-600">
+                      <strong>Complete platform directory:</strong> Browse all available booking sites. 
+                      Our Smart Recommendations above show the best options for your specific trip.
+                    </p>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {bookingOptions.accommodations.map((platform, index) => (
                       <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
@@ -344,7 +354,8 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
                           ))}
                         </div>
                       </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
