@@ -200,7 +200,7 @@ const AIBookingAssistant = ({ itinerary, guests: initialGuests = 2, rooms: initi
               <div className="flex items-center">
                 <FaStar className="text-yellow-500 mr-3" />
                 <h4 className="font-semibold text-gray-900">Smart Recommendations</h4>
-                <span className="ml-2 text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                <span className="ml-2 text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded-full whitespace-nowrap">
                   AI Powered
                 </span>
               </div>
