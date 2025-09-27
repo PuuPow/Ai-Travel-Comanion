@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
-import { FaPlane, FaUser, FaEnvelope, FaCalendarAlt, FaArrowLeft, FaEdit, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaPlane, FaUser, FaEnvelope, FaCalendarAlt, FaArrowLeft, FaEdit, FaLock, FaEye, FaEyeSlash, FaBars, FaTimes, FaHome, FaSignOutAlt, FaBox } from 'react-icons/fa';
 
 export default function Account() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -25,6 +25,7 @@ export default function Account() {
     confirmPassword: ''
   });
   const [passwordError, setPasswordError] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -149,28 +150,81 @@ export default function Account() {
           <div className="flex items-center justify-between">
             <div className="flex items-center min-w-0">
               <FaPlane className="text-white text-xl flex-shrink-0" />
-              <h1 className="text-xl font-bold text-white ml-2 hidden sm:block">AI Travel Companion</h1>
-              <h1 className="text-lg font-bold text-white ml-2 sm:hidden">Travel</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-white ml-2">AI Travel Companion</h1>
             </div>
-            <nav className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 min-w-0">
-              <Link href="/" className="text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base">
-                <FaArrowLeft className="inline mr-2" />
-                <span className="hidden sm:inline">Back to Home</span>
-                <span className="sm:hidden">Home</span>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-4">
+              <Link href="/" className="text-white/90 hover:text-white font-medium transition-colors">
+                Home
               </Link>
-              <Link href="/itineraries" className="text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base">
-                <span className="hidden sm:inline">My Adventures</span>
-                <span className="sm:hidden">Adventures</span>
+              <Link href="/itineraries" className="text-white/90 hover:text-white font-medium transition-colors">
+                My Trips
+              </Link>
+              <Link href="/reservations" className="text-white/90 hover:text-white font-medium transition-colors">
+                Reservations
+              </Link>
+              <Link href="/packing" className="text-white/90 hover:text-white font-medium transition-colors">
+                Packing
+              </Link>
+              <Link href="/account" className="text-white font-medium">
+                Account
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-white/90 hover:text-white font-medium transition-colors px-2 py-1 sm:px-3 rounded-md hover:bg-white/10 text-xs sm:text-sm md:text-base"
+                className="text-white/90 hover:text-red-200 font-medium transition-colors"
               >
-                <span className="hidden sm:inline">Logout</span>
-                <span className="sm:hidden">Logout</span>
+                Logout
               </button>
             </nav>
+            
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden text-white p-2"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+            </button>
           </div>
+          
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden mt-4 pb-4 border-t border-white/20">
+              <nav className="flex flex-col space-y-3 pt-4">
+                <Link href="/" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaHome className="mr-3" />
+                  Home
+                </Link>
+                <Link href="/itineraries" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaPlane className="mr-3" />
+                  My Trips
+                </Link>
+                <Link href="/reservations" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaCalendarAlt className="mr-3" />
+                  Reservations
+                </Link>
+                <Link href="/packing" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaBox className="mr-3" />
+                  Smart Packing
+                </Link>
+                <Link href="/account" className="flex items-center text-white font-medium py-2">
+                  <FaUser className="mr-3" />
+                  Account
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center text-white/90 hover:text-red-200 font-medium transition-colors py-2 text-left"
+                >
+                  <FaSignOutAlt className="mr-3" />
+                  Logout
+                </button>
+              </nav>
+            </div>
+          )}
         </div>
       </header>
 

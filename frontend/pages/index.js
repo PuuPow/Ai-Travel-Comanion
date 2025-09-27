@@ -2,12 +2,13 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { FaPlane, FaCalendarAlt, FaSuitcase, FaMapMarkedAlt, FaArrowRight, FaPlus, FaBrain, FaUser, FaCrown } from 'react-icons/fa';
+import { FaPlane, FaCalendarAlt, FaSuitcase, FaMapMarkedAlt, FaArrowRight, FaPlus, FaBrain, FaUser, FaCrown, FaBars, FaTimes, FaHome, FaSignOutAlt, FaBox } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
   const [recentItineraries, setRecentItineraries] = useState([]);
   const [upcomingReservations, setUpcomingReservations] = useState([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const { user, isAuthenticated, logout } = useAuth();
   const router = useRouter();
@@ -39,49 +40,110 @@ export default function Home() {
               <h1 className="text-xl font-bold text-white ml-2 hidden sm:block">AI Travel Companion</h1>
               <h1 className="text-lg font-bold text-white ml-2 sm:hidden">Travel</h1>
             </div>
-            <nav className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 min-w-0">
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-4 min-w-0">
               {isAuthenticated() ? (
                 <>
-                  <Link href="/itineraries" className="text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base">
-                    <span className="hidden sm:inline">My Adventures</span>
-                    <span className="sm:hidden">Adventures</span>
+                  <Link href="/itineraries" className="text-white/90 hover:text-white font-medium transition-colors">
+                    My Trips
                   </Link>
-                  <Link href="/reservations" className="text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base hidden md:inline-block">
-                    <span className="hidden lg:inline">Reservations</span>
-                    <span className="lg:hidden">Bookings</span>
+                  <Link href="/reservations" className="text-white/90 hover:text-white font-medium transition-colors">
+                    Reservations
                   </Link>
-                  <Link href="/premium" className="text-yellow-300 hover:text-yellow-200 font-medium transition-colors text-sm sm:text-base flex items-center">
+                  <Link href="/packing" className="text-white/90 hover:text-white font-medium transition-colors">
+                    Smart Packing
+                  </Link>
+                  <Link href="/premium" className="text-yellow-300 hover:text-yellow-200 font-medium transition-colors flex items-center">
                     <FaCrown className="mr-1 text-xs" />
-                    <span className="hidden sm:inline">Premium</span>
-                    <span className="sm:hidden">Pro</span>
+                    Premium
                   </Link>
-                  <Link href="/account" className="text-white/90 hover:text-white text-xs sm:text-sm hidden lg:inline truncate transition-colors cursor-pointer hover:underline">
-                    Hi, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
-                  </Link>
-                  <Link href="/account" className="text-white/90 hover:text-white text-xs sm:text-sm lg:hidden transition-colors cursor-pointer hover:underline">
+                  <Link href="/account" className="text-white/90 hover:text-white truncate transition-colors cursor-pointer hover:underline">
                     Hi, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="text-white/90 hover:text-white font-medium transition-colors px-2 py-1 sm:px-3 rounded-md hover:bg-white/10 text-xs sm:text-sm md:text-base"
+                    className="text-white/90 hover:text-white font-medium transition-colors px-3 rounded-md hover:bg-white/10"
                   >
-                    <span className="hidden sm:inline">Logout</span>
-                    <span className="sm:hidden">Logout</span>
+                    Logout
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base">
+                  <Link href="/login" className="text-white/90 hover:text-white font-medium transition-colors">
                     Login
                   </Link>
-                  <Link href="/signup" className="bg-white text-blue-600 px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm sm:text-base">
-                    <span className="hidden sm:inline">Sign Up</span>
-                    <span className="sm:hidden">Join</span>
+                  <Link href="/signup" className="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                    Sign Up
                   </Link>
                 </>
               )}
             </nav>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden text-white p-2"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+            </button>
           </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden mt-4 pb-2 border-t border-white/20">
+              <nav className="flex flex-col space-y-2 pt-3">
+                <Link href="/" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaHome className="mr-3" />
+                  Home
+                </Link>
+                <Link href="/itineraries" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaPlane className="mr-3" />
+                  My Trips
+                </Link>
+                <Link href="/reservations" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaCalendarAlt className="mr-3" />
+                  Reservations
+                </Link>
+                <Link href="/packing" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaBox className="mr-3" />
+                  Smart Packing
+                </Link>
+                <Link href="/premium" className="flex items-center text-yellow-300 hover:text-yellow-200 font-medium transition-colors py-2">
+                  <FaCrown className="mr-3" />
+                  Premium
+                </Link>
+                {isAuthenticated() ? (
+                  <>
+                    <Link href="/account" className="flex items-center text-white/90 hover:text-white transition-colors py-2">
+                      <FaUser className="mr-3" />
+                      Account
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center text-white/90 hover:text-red-200 font-medium transition-colors py-2 text-left"
+                    >
+                      <FaSignOutAlt className="mr-3" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                      Login
+                    </Link>
+                    <Link href="/signup" className="flex items-center text-blue-600 bg-white font-medium transition-colors py-2 px-3 rounded">
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </div>
+          )}
         </div>
       </header>
 

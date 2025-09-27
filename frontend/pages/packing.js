@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { FaPlane, FaSuitcase, FaMapMarkerAlt, FaCalendarAlt, FaEye, FaPlus, FaCheckCircle, FaCircle } from 'react-icons/fa';
+import { FaPlane, FaSuitcase, FaMapMarkerAlt, FaCalendarAlt, FaEye, FaPlus, FaCheckCircle, FaCircle, FaBars, FaTimes, FaHome, FaUser, FaSignOutAlt, FaBox } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 
@@ -10,6 +10,7 @@ export default function Packing() {
   const [itineraries, setItineraries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
   const router = useRouter();
@@ -124,36 +125,88 @@ export default function Packing() {
         </Head>
 
         {/* Header */}
-        <header className="bg-white shadow-sm border-b">
+        <header className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Link href="/" className="flex items-center">
-                  <FaPlane className="text-blue-600 text-xl mr-2" />
-                  <h1 className="text-xl font-bold text-gray-900">Travel Planner</h1>
+                  <FaPlane className="text-white text-xl mr-2" />
+                  <h1 className="text-lg sm:text-xl font-bold text-white">AI Travel Companion</h1>
                 </Link>
               </div>
-              <div className="flex items-center space-x-4">
-                <Link href="/itineraries" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-4">
+                <Link href="/" className="text-white/90 hover:text-white font-medium transition-colors">
+                  Home
+                </Link>
+                <Link href="/itineraries" className="text-white/90 hover:text-white font-medium transition-colors">
                   My Trips
                 </Link>
-                <Link href="/reservations" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                <Link href="/reservations" className="text-white/90 hover:text-white font-medium transition-colors">
                   Reservations
                 </Link>
-                <Link href="/packing" className="text-blue-600 font-medium">
-                  Packing
+                <Link href="/packing" className="text-white font-medium">
+                  Smart Packing
                 </Link>
-                <Link href="/account" className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer hover:underline">
+                <Link href="/account" className="text-white/90 hover:text-white transition-colors cursor-pointer hover:underline">
                   Hi, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
                 </Link>
                 <button
                   onClick={logout}
-                  className="text-gray-600 hover:text-red-600 font-medium transition-colors"
+                  className="text-white/90 hover:text-red-200 font-medium transition-colors"
                 >
                   Logout
                 </button>
               </div>
+              
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden text-white p-2"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+              </button>
             </div>
+            
+            {/* Mobile Menu */}
+            {mobileMenuOpen && (
+              <div className="md:hidden mt-4 pb-4 border-t border-white/20">
+                <nav className="flex flex-col space-y-3 pt-4">
+                  <Link href="/" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                    <FaHome className="mr-3" />
+                    Home
+                  </Link>
+                  <Link href="/itineraries" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                    <FaPlane className="mr-3" />
+                    My Trips
+                  </Link>
+                  <Link href="/reservations" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                    <FaCalendarAlt className="mr-3" />
+                    Reservations
+                  </Link>
+                  <Link href="/packing" className="flex items-center text-white font-medium py-2">
+                    <FaBox className="mr-3" />
+                    Smart Packing
+                  </Link>
+                  <Link href="/account" className="flex items-center text-white/90 hover:text-white transition-colors py-2">
+                    <FaUser className="mr-3" />
+                    Hi, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center text-white/90 hover:text-red-200 font-medium transition-colors py-2 text-left"
+                  >
+                    <FaSignOutAlt className="mr-3" />
+                    Logout
+                  </button>
+                </nav>
+              </div>
+            )}
           </div>
         </header>
 

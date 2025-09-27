@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { FaArrowLeft, FaEdit, FaCalendarAlt, FaMapMarkerAlt, FaClock, FaPlane, FaStar, FaUtensils, FaCamera, FaFileExport, FaBell } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaCalendarAlt, FaMapMarkerAlt, FaClock, FaPlane, FaStar, FaUtensils, FaCamera, FaFileExport, FaBell, FaBars, FaTimes, FaHome, FaUser, FaSignOutAlt, FaBox } from 'react-icons/fa';
 import { format } from 'date-fns';
 import DayPlanEditor from '../../components/DayPlanEditor';
 import WeatherWidget from '../../components/WeatherWidget';
@@ -19,6 +19,7 @@ export default function ItineraryDetail() {
   const [editingDay, setEditingDay] = useState(null);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -174,23 +175,64 @@ export default function ItineraryDetail() {
 
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center min-w-0">
               <Link href="/" className="flex items-center min-w-0">
-                <FaPlane className="text-white text-xl sm:text-2xl flex-shrink-0" />
-                <h1 className="text-xl sm:text-2xl font-bold text-white ml-2 sm:ml-3 hidden sm:block">AI Travel Companion</h1>
-                <h1 className="text-lg font-bold text-white ml-2 sm:hidden">Travel</h1>
+                <FaPlane className="text-white text-xl flex-shrink-0" />
+                <h1 className="text-lg sm:text-xl font-bold text-white ml-2">AI Travel Companion</h1>
               </Link>
             </div>
-            <div className="flex items-center min-w-0">
-              <Link href="/itineraries" className="text-white/90 hover:text-white transition-colors flex items-center text-sm sm:text-base">
-                <FaArrowLeft className="mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Back to Adventures</span>
-                <span className="sm:hidden">Back</span>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link href="/" className="text-white/90 hover:text-white font-medium transition-colors">
+                Home
+              </Link>
+              <Link href="/itineraries" className="text-white font-medium">
+                My Trips
+              </Link>
+              <Link href="/reservations" className="text-white/90 hover:text-white font-medium transition-colors">
+                Reservations
+              </Link>
+              <Link href="/packing" className="text-white/90 hover:text-white font-medium transition-colors">
+                Packing
               </Link>
             </div>
+            
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden text-white p-2"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+            </button>
           </div>
+          
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden mt-4 pb-4 border-t border-white/20">
+              <nav className="flex flex-col space-y-3 pt-4">
+                <Link href="/" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaHome className="mr-3" />
+                  Home
+                </Link>
+                <Link href="/itineraries" className="flex items-center text-white font-medium py-2">
+                  <FaPlane className="mr-3" />
+                  My Trips
+                </Link>
+                <Link href="/reservations" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaCalendarAlt className="mr-3" />
+                  Reservations
+                </Link>
+                <Link href="/packing" className="flex items-center text-white/90 hover:text-white font-medium transition-colors py-2">
+                  <FaBox className="mr-3" />
+                  Smart Packing
+                </Link>
+              </nav>
+            </div>
+          )}
         </div>
       </header>
 
