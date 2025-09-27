@@ -1,0 +1,6 @@
+@echo off
+echo Starting Travel Planner Frontend...
+cd /d "C:\Users\dspen\projects\travel-planner\frontend"
+echo Frontend starting on port 3000...
+npm run dev
+pause
