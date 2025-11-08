@@ -1,0 +1,39 @@
+services:
+  # Backend API
+  - type: web
+    name: travel-planner-backend
+    runtime: node
+    region: ohio
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: npx prisma db push --accept-data-loss && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: travel-planner-db
+          property: connectionString
+      - key: CORS_ORIGIN
+        value: https://ai-travel-companion-8nyu1d43j-puupows-projects.vercel.app
+      - key: FRONTEND_URL
+        value: https://ai-travel-companion-8nyu1d43j-puupows-projects.vercel.app
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+
+databases:
+  - name: travel-planner-db
+    plan: free
+    databaseName: travel_planner
+    user: travel_user
