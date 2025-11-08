@@ -46,13 +46,10 @@ app.use((req, res, next) => {
 // Health check endpoint
 app.get('/health', async (req, res) => {
   try {
-    const prismaClient = getPrismaClient();
-    // Test database connection
-    await prismaClient.$queryRaw`SELECT 1`;
     res.json({ 
       status: 'OK', 
       timestamp: new Date().toISOString(),
-      database: 'connected',
+      database: 'not-tested',
       environment: process.env.NODE_ENV || 'production',
       deployment: 'vercel-serverless'
     });
@@ -60,7 +57,6 @@ app.get('/health', async (req, res) => {
     res.status(500).json({ 
       status: 'ERROR', 
       timestamp: new Date().toISOString(),
-      database: 'disconnected',
       error: error.message,
       deployment: 'vercel-serverless'
     });
@@ -92,10 +88,16 @@ app.get('/', (req, res) => {
 // Use modular routes with Google Places integration
 const authRoutes = require('../src/routes/auth');
 const itineraryRoutes = require('../src/routes/itineraries');
+const mealsRoutes = require('../src/routes/meals');
+const shareRoutes = require('../src/routes/share');
+const paymentRoutes = require('../src/routes/payments');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/itineraries', itineraryRoutes);
+app.use('/api/meals', mealsRoutes);
+app.use('/api/share', shareRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

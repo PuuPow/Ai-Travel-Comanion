@@ -38,7 +38,7 @@ export default function Home() {
             <div className="flex items-center min-w-0">
               <FaPlane className="text-white text-xl flex-shrink-0" />
               <h1 className="text-xl font-bold text-white ml-2 hidden sm:block">AI Travel Companion</h1>
-              <h1 className="text-lg font-bold text-white ml-2 sm:hidden">Travel</h1>
+              <h1 className="text-lg font-bold text-white ml-2 sm:hidden">AI Travel Companion</h1>
             </div>
             
             {/* Desktop Navigation */}

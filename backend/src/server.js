@@ -17,20 +17,41 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
     
-    // Allow localhost and any IP on port 3000 (for development)
-    if (origin.match(/^http:\/\/(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):3000$/)) {
-      return callback(null, true);
-    }
-    
-    // Allow specific configured origins
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://192.168.1.22:3000',
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+    // In production, allow Vercel domains and configured origins
+    if (process.env.NODE_ENV === 'production') {
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        /\.vercel\.app$/,  // Allow all Vercel domains
+        /localhost:3000$/,  // For testing
+      ].filter(Boolean);
+      
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (typeof allowed === 'string') {
+          return origin === allowed;
+        } else {
+          return allowed.test(origin);
+        }
+      });
+      
+      if (isAllowed) {
+        return callback(null, true);
+      }
+    } else {
+      // Allow localhost and any IP on port 3000 (for development)
+      if (origin.match(/^http:\/\/(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):3000$/)) {
+        return callback(null, true);
+      }
+      
+      // Allow specific configured origins
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://192.168.1.22:3000',
+        process.env.FRONTEND_URL
+      ].filter(Boolean);
+      
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
     }
     
     callback(new Error('Not allowed by CORS'));
