@@ -4,8 +4,8 @@
   "description": "Backend API for travel planner application",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/server.js",
-    "build": "prisma generate && prisma db push",
+    "start": "npx prisma db push --accept-data-loss && node src/server.js",
+    "build": "prisma generate",
     "dev": "nodemon src/server.js",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
@@ -24,11 +24,11 @@
     "jsonwebtoken": "^9.0.2",
     "node-cache": "^5.1.2",
     "openai": "^4.11.1",
+    "prisma": "^5.4.2",
     "stripe": "^18.5.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "prisma": "^5.4.2"
+    "nodemon": "^3.0.1"
   },
   "keywords": [
     "travel",
